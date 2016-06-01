@@ -17,6 +17,13 @@
                 href="${pageContext.request.contextPath}/module/dhisreport/configureDhis2.form"><spring:message
                 code="dhisreport.configureDHIS2" /></a>
     </li>
+    
+    <li
+        <c:if test='<%= request.getRequestURI().contains("/listDhis2Reports") %>'>class="active"</c:if>>
+            <a
+                href="${pageContext.request.contextPath}/module/dhisreport/mapLocations.form"><spring:message
+                code="dhisreport.mapLocations" /></a>
+    </li>
 
     <li
         <c:if test='<%= request.getRequestURI().contains("/listDhis2Reports") %>'>class="active"</c:if>>

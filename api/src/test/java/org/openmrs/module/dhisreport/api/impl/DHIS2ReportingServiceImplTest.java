@@ -16,57 +16,64 @@ import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.module.dhisreport.api.DHIS2ReportingService;
 import org.openmrs.module.dhisreport.api.dxf2.DataValueSet;
-import org.openmrs.module.dhisreport.api.model.*;
+import org.openmrs.module.dhisreport.api.model.ReportDefinition;
+import org.openmrs.module.dhisreport.api.model.ReportTemplates;
 import org.openmrs.module.dhisreport.api.utils.MonthlyPeriod;
 import org.openmrs.module.dhisreport.api.utils.Period;
+import org.openmrs.test.BaseContextSensitiveTest;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.openmrs.api.context.Context;
 
 /**
- * Tests {@link $ DHIS2ReportingService} .
+ * Tests {@link $DHIS2ReportingService} .
  */
-public class DHIS2ReportingServiceImplTest{
+public class DHIS2ReportingServiceImplTest
+    extends BaseModuleContextSensitiveTest
+{
 
-	protected final Log log = LogFactory.getLog(getClass());
-	
-	@Autowired
-	private DHIS2ReportingService service;
+    protected final Log log = LogFactory.getLog( getClass() );
 
-	@Before
-	public void before() {
-		BasicConfigurator.configure();
-		//service = Context.getService(DHIS2ReportingService.class);
-	}
+    DHIS2ReportingService dhis2ReportingService = null;
 
-	/**
-	 * @see DHIS2ReportingServiceImpl#evaluateReportDefinition(ReportDefinition,Period,Location)
-	 * @verifies evaluate Report Definition
-	 */
-	@Test
-	public void evaluateReportDefinition_shouldEvaluateReportDefinition() throws Exception {
+    @Before
+    public void before()
+    {
+        BasicConfigurator.configure();
+        dhis2ReportingService = Context.getService( DHIS2ReportingService.class );
+    }
 
-		ClassPathResource resource = new ClassPathResource("reportDefinition.xml");
-		JAXBContext jaxbContext = JAXBContext.newInstance(ReportTemplates.class);
+    /**
+     * @see DHIS2ReportingServiceImpl#evaluateReportDefinition(ReportDefinition,Period,Location)
+     * @verifies evaluate Report Definition
+     */
+    @Test
+    public void evaluateReportDefinition_shouldEvaluateReportDefinition()
+        throws Exception
+    {
 
-		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-		ReportTemplates reportTemplates = (ReportTemplates) jaxbUnmarshaller.unmarshal(resource.getInputStream());
-		List<ReportDefinition> rds = reportTemplates.getReportDefinitions();
-		DHIS2ReportingServiceImpl impl = new DHIS2ReportingServiceImpl();
-		String timeperiod = "2016-06-28";
-		Location location = new Location();
-		location.setName("County General");
-		location.setDescription("desc");
-		location.setAddress1("address1");
-		Period period = new MonthlyPeriod(new SimpleDateFormat("yyyy-MM-dd").parse(timeperiod));
+        ClassPathResource resource = new ClassPathResource( "reportDefinition.xml" );
+        JAXBContext jaxbContext = JAXBContext.newInstance( ReportTemplates.class );
+        DHIS2ReportingService impl = Context.getService( DHIS2ReportingService.class );
 
-		for (ReportDefinition rd : rds) {
-			System.out.println("ReportDefinition uid = " + rd.getUid() + " name  = " + rd.getName());
-			impl.evaluateReportDefinition(rd, period, location);
-			// DHIS2ReportingService service = Context.getService(
-			// DHIS2ReportingService.class );
-			//DataValueSet dvs = service.evaluateReportDefinition(rd, period, location);
-		}
-	}
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        ReportTemplates reportTemplates = (ReportTemplates) jaxbUnmarshaller.unmarshal( resource.getInputStream() );
+        List<ReportDefinition> rds = reportTemplates.getReportDefinitions();
+        String timeperiod = "2016-06-28";
+        Location location = new Location();
+        location.setName( "County General" );
+        location.setDescription( "desc" );
+        location.setAddress1( "address1" );
+        Period period = new MonthlyPeriod( new SimpleDateFormat( "yyyy-MM-dd" ).parse( timeperiod ) );
+
+        for ( ReportDefinition rd : rds )
+        {
+            System.out.println( "ReportDefinition uid = " + rd.getUid() + " name  = " + rd.getName() );
+            dhis2ReportingService.evaluateReportDefinition( rd, period, location );
+            // DHIS2ReportingService service = Context.getService(
+            // DHIS2ReportingService.class );
+            //DataValueSet dvs = service.evaluateReportDefinition(rd, period, location);
+        }
+    }
 }
